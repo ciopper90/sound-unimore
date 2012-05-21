@@ -1,6 +1,6 @@
-from acq_0 import *
-import caricapy_0 as caricapy
-from feature_0 import feature
+from acq import *
+import caricapy as caricapy
+from feature import feature
 import string
 
 
@@ -51,7 +51,7 @@ for i in range(len(v)):
 			for h in f:
 				file.write("c\t")
 			file.write("\nclass\n")
-		file.write(d[i][0][:string.find(d[i][0],"_")]+"\t"+d[i][0]+"_"+str(k)+"\t")
+		file.write(d[i][0][:string.find(d[i][0],"_")]+"\t"+d[i][0]+"_"+str(k).zfill(2)+"\t")
                 for h in f.values():
                 	file.write(str(h)+"\t")
                 file.write("\n")
