@@ -2,7 +2,7 @@ from acq import *
 import caricapy as caricapy
 from feature import feature
 import string
-
+#test
 
 indirizzo="../audio/"
 tempo_campione=0.064
