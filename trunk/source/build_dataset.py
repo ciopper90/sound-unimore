@@ -9,7 +9,6 @@ import pprint
 import wave
 
 import numpy as np
-import scipy.io.wavfile as wavfile
 
 config = {
   'root_directory' : '../dataset/',
@@ -90,7 +89,6 @@ def samples_extraction(fname):
     return samples
 
 def save_orange(samples):
-    
     outstr = []
     for sample in samples:
         filename = os.path.basename(sample['fname'])
@@ -115,7 +113,6 @@ def save_weka(outdata):
     return
 
 def main():
-
     samples = []
     for root, dirs, files in os.walk(config['root_directory']):
         print 'processing directory %s' % (root,)  
