@@ -16,6 +16,7 @@ config = {
   'sample_duration' : 0.064,
   'sample_in_chunk' : 5,
   'output_format' : 'orange',
+  'output_filename' : 'dataset.tab'
 }
 
 def features_extraction(sample):
@@ -53,12 +54,18 @@ def samples_extraction(fname):
     wav = wave.open(fname, 'r')
     (nchannels, sample_width, sample_rate, n_frames, comptype, compname) = wav.getparams()
     frames = wav.readframes(n_frames * nchannels)
+    out = struct.unpack_from ("%dh" % n_frames * nchannels, frames)
     wav.close()
     
-    # mono conversion: 0/1 = left/right
-    out = struct.unpack_from ("%dh" % n_frames * nchannels, frames)
-    data = np.array([out[i] for i in range(0, len(out), 2)])
-        
+    print '  - %s [%dch, %dbits, %dhz, %ds]' % (
+        fname, nchannels, sample_width * 8, sample_rate, n_frames / sample_rate)
+    
+    # eventual mono conversion
+    if nchannels == 1:
+        data = np.array(out[i]) 
+    else:
+        data = np.array([out[i] for i in range(0, len(out), nchannels)])
+               
     file_duration = n_frames / sample_rate
     data_point_duration = 1.0 / sample_rate
     chunk_data_points = config['chunk_duration'] / data_point_duration
@@ -105,11 +112,12 @@ def save_orange(samples):
             sample['lefr'],
             sample['zcr']))
             
-    # qua basta scrivere su file!
-    print '\n'.join(outstr)
+    out_file = open(config['output_filename'], 'w')
+    out_file.write('\n'.join(outstr))
+    out_file.close()
     return
     
-def save_weka(outdata):
+def save_weka(samples):
     return
 
 def main():
@@ -118,7 +126,6 @@ def main():
         print 'processing directory %s' % (root,)  
         for fname in files:
             if fname.lower().endswith('.wav'):
-                print '- found %s' % (fname,)
                 current = samples_extraction(os.path.join(root, fname))
                 
                 for sample in current:
