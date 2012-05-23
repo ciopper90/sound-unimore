@@ -3,44 +3,76 @@
 import os
 import os.path
 import sys
+import audioop
+import struct
 import pprint
+import wave
 
+import numpy as np
 import scipy.io.wavfile as wavfile
 
 config = {
-  'root_directory' : '../audio/',
-  'chunk_duration' : 2,
+  'root_directory' : '../dataset/',
+  'chunk_duration' : 10,
   'sample_duration' : 0.064,
   'sample_in_chunk' : 5,
   'output_format' : 'orange',
 }
 
 def features_extraction(sample):
-    # per compilare questa lista puoi richiamare funzioni esterne
-    # che ricevono in input un sample
-    print sample
-    return [2, 2, 2]
+    sample_rate = sample['sample_rate']
+    sample_width = sample['sample_width']
+    signal = sample['data']
+    
+    # zero crossing rate
+    sample['zcr'] = float(audioop.cross(signal, sample_width)) / len(signal)
+    
+    
+    # low energy frame rate
+    rms = audioop.rms(signal, sample_width) / 2    
+    lefr = 0
+    for data_point in signal:
+        if data_point < rms: 
+            lefr += 1
+    sample['lefr'] = lefr
+
+    
+    # sc
+    p = np.abs(np.fft.rfft(signal))
+    f = np.linspace(0, sample_rate / 2.0, len(p))
+    
+    num = den = 0.0
+    for i in range(len(f)):
+        num = num + (i * (p[i] * p[i]))
+    for i in range(len(f)):
+        den = den + ((p[i] * p[i]))
+        
+    sample['sc'] = num / den
     return
 
 def samples_extraction(fname):
-    samples = []    
-    sample_rate, data = wavfile.read(fname)
+    wav = wave.open(fname, 'r')
+    (nchannels, sample_width, sample_rate, n_frames, comptype, compname) = wav.getparams()
+    frames = wav.readframes(n_frames * nchannels)
+    wav.close()
     
-    file_data_points = len(data)
-    file_duration = file_data_points / sample_rate
+    # mono conversion: 0/1 = left/right
+    out = struct.unpack_from ("%dh" % n_frames * nchannels, frames)
+    data = np.array([out[i] for i in range(0, len(out), 2)])
+        
+    file_duration = n_frames / sample_rate
     data_point_duration = 1.0 / sample_rate
-    
     chunk_data_points = config['chunk_duration'] / data_point_duration
     sample_data_points = config['sample_duration'] / data_point_duration
-    
     n_chunks = int(file_duration / config['chunk_duration'])
     n_sample = config['sample_in_chunk']
 
+    samples = []
     chunk = 0
     while chunk < n_chunks:
         sample = 0
         while sample < n_sample:
-            start_data_point = (file_data_points / n_chunks) * chunk
+            start_data_point = (n_frames / n_chunks) * chunk
             start_data_point += (chunk_data_points / n_sample) * sample
             end_data_point = start_data_point + sample_data_points
             
@@ -48,6 +80,8 @@ def samples_extraction(fname):
                 'fname': fname,
                 'chunk_id': chunk,
                 'sample_id': sample,
+                'sample_rate' : sample_rate,
+                'sample_width' : sample_width,
                 'data': data[start_data_point:end_data_point],
             })
             
@@ -55,26 +89,52 @@ def samples_extraction(fname):
         chunk += 1
     return samples
 
-def save(outdata):
+def save_orange(samples):
+    
+    outstr = []
+    for sample in samples:
+        filename = os.path.basename(sample['fname'])
+        name, ext = os.path.splitext(filename)
+        classname = name.split('_')[0]
+        id = '%s_%s_%s' % (name, 
+            str(sample['chunk_id']).zfill(3), 
+            str(sample['sample_id']).zfill(3))
+        
+        outstr.append('%s\t%s\t%f\t%f\t%f' % (
+            classname,
+            id,
+            sample['sc'],
+            sample['lefr'],
+            sample['zcr']))
+            
+    # qua basta scrivere su file!
+    print '\n'.join(outstr)
     return
-    #pprint.pprint(outdata)
+    
+def save_weka(outdata):
+    return
 
 def main():
-    outdata = []
-    
+
+    samples = []
     for root, dirs, files in os.walk(config['root_directory']):
         print 'processing directory %s' % (root,)  
         for fname in files:
             if fname.lower().endswith('.wav'):
                 print '- found %s' % (fname,)
-                samples = samples_extraction(os.path.join(root, fname))
-                for sample in samples:
-                    features = features_extraction(sample)
-                    features.insert(0, os.path.join(root, fname))
-                    outdata.append(features)
-    save(outdata)
+                current = samples_extraction(os.path.join(root, fname))
+                
+                for sample in current:
+                    features_extraction(sample)
+                
+                samples.extend(current)
+                    
+    if config['output_format'] == 'orange':
+        save_orange(samples)
+    else:
+        save_weka(samples)
+        
     sys.exit()
-
 
 if __name__ == '__main__':
   main()
