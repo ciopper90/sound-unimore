@@ -1,40 +1,39 @@
 if not in_data == None:
-    print len(in_data)
-    usare=list(in_data)
-    vecchia=str(in_data[0][0])[:-3]
-    scelte={}
-    test=""
-    #print in_data[0]["tipo(Interactive Tree Builder)"]
+    #extract learner name
+    classifier=in_data[0].get_metas(str).keys()[0]
+    #print classifier
+    #print len(in_data)
+    
+    first_sample=str(in_data[0][0])[:-3]
+    select={}
+    type=""
     for k in range(len(in_data)):
         i=in_data[k]
-        nuova=str(i[0])[:-3]
-        if vecchia != nuova:   
-            #print scelte
-            vecchia=nuova
-            #print max(scelte, key=scelte.get)
-            #aggiungere il tutto ad out data
-            in_data[k-5]["tipo(Interactive Tree Builder)"]=max(scelte, key=scelte.get)
-            scelte={}
+        new_sample=str(i[0])[:-3]
+        #compare the name of sample
+        if first_sample != new_sample:   
+            first_sample=new_sample
+            #modify class ok in_data element
+            in_data[k-5][classifier]=max(select, key=select.get)
+            #reset select
+            select={}
     
     
-        #calcolo tipi per ogni gruppo di campioni
-        test= str(i["tipo(Interactive Tree Builder)"])
-        if scelte.has_key(test):   
-            scelte[test] = scelte[test] +1
-            #print scelte[test]
+        #extract type
+        type= str(i[classifier])
+        if select.has_key(type):   
+            select[type] = select[type] +1
         else:
-            scelte[test]=1
+            select[type]=1
 
     lung=len(in_data)
     i=0
     while i < lung:
-        if not "00" in str(in_data[i][0]):
+        if not "_00" in str(in_data[i][0])[-3:]:
             del in_data[i]
             lung =lung - 1
-            print lung
+            #print lung
             i= i-1
-        if lung < i+1:
-            print "a"
-            break;
         i=i+1
+    print len(in_data)
     out_data=in_data
