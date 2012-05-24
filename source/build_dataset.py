@@ -37,7 +37,7 @@ def features_extraction(sample):
     sample['lefr'] = lefr
 
     
-    # sc
+    # spectral centroid
     p = np.abs(np.fft.rfft(signal))
     f = np.linspace(0, sample_rate / 2.0, len(p))
     
@@ -105,9 +105,8 @@ def save_orange(samples):
             str(sample['chunk_id']).zfill(3), 
             str(sample['sample_id']).zfill(3))
         
-        outstr.append('%s\t%s\t%f\t%f\t%f' % (
+        outstr.append('%s\t%f\t%f\t%f' % (
             classname,
-            id,
             sample['sc'],
             sample['lefr'],
             sample['zcr']))
