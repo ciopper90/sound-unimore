@@ -12,7 +12,7 @@ import numpy as np
 
 config = {
   'root_directory' : '../dataset/',
-  'chunk_duration' : 2,
+  'chunk_duration' : 0.5,
   'sample_duration' : 0.064,
   'sample_in_chunk' : 5,
   'output_format' : 'orange',
@@ -105,8 +105,9 @@ def save_orange(samples):
             str(sample['chunk_id']).zfill(3), 
             str(sample['sample_id']).zfill(3))
         
-        outstr.append('%s\t%f\t%f\t%f' % (
+        outstr.append('%s\t%s\t%f\t%f\t%f' % (
             classname,
+            id,
             sample['sc'],
             sample['lefr'],
             sample['zcr']))
