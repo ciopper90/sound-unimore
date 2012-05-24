@@ -12,9 +12,9 @@ import numpy as np
 
 config = {
   'root_directory' : '../dataset/',
-  'chunk_duration' : 3,
+  'chunk_duration' : 2,
   'sample_duration' : 0.064,
-  'sample_in_chunk' : 10,
+  'sample_in_chunk' : 5,
   'output_format' : 'orange',
   'output_filename' : 'dataset'
 }
