@@ -15,7 +15,7 @@ config = {
   'chunk_duration' : 3,
   'sample_duration' : 0.064,
   'sample_in_chunk' : 10,
-  'output_format' : 'weka',
+  'output_format' : 'orange',
   'output_filename' : 'dataset'
 }
 
