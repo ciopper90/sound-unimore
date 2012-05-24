@@ -73,7 +73,9 @@ def samples_extraction(fname):
     samples = []
     chunk = 0
     
-    n_chunks = 100
+    # TOBEFIXED
+    if n_chunks > 100:
+	n_chunks = 100
     
     while chunk < n_chunks:
         sample = 0
