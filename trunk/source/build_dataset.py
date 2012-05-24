@@ -15,8 +15,8 @@ config = {
   'chunk_duration' : 10,
   'sample_duration' : 0.064,
   'sample_in_chunk' : 5,
-  'output_format' : 'orange',
-  'output_filename' : 'dataset.tab'
+  'output_format' : 'weka',
+  'output_filename' : 'dataset'
 }
 
 def features_extraction(sample):
@@ -61,10 +61,7 @@ def samples_extraction(fname):
         fname, nchannels, sample_width * 8, sample_rate, n_frames / sample_rate)
     
     # eventual mono conversion
-    if nchannels == 1:
-        data = np.array(out[i]) 
-    else:
-        data = np.array([out[i] for i in range(0, len(out), nchannels)])
+    data = np.array([out[i] for i in range(0, len(out), nchannels)])
                
     file_duration = n_frames / sample_rate
     data_point_duration = 1.0 / sample_rate
@@ -112,12 +109,31 @@ def save_orange(samples):
             sample['lefr'],
             sample['zcr']))
             
-    out_file = open(config['output_filename'], 'w')
+    out_file = open(config['output_filename'] + '.tab', 'w')
     out_file.write('\n'.join(outstr))
     out_file.close()
     return
     
 def save_weka(samples):
+    outstr = []
+    for sample in samples:
+        filename = os.path.basename(sample['fname'])
+        name, ext = os.path.splitext(filename)
+        classname = name.split('_')[0]
+        id = '%s_%s_%s' % (name, 
+            str(sample['chunk_id']).zfill(3), 
+            str(sample['sample_id']).zfill(3))
+        
+        outstr.append('%f,%f,%f,%s,%s' % (
+            sample['sc'],
+            sample['lefr'],
+            sample['zcr'],
+            id,
+            classname))
+            
+    out_file = open(config['output_filename'] + '.arff', 'w')
+    out_file.write('\n'.join(outstr))
+    out_file.close()
     return
 
 def main():
