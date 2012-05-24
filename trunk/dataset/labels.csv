@@ -1,0 +1,8 @@
+# 1: auto,treno,bus,ristorante,centrocommerciale,parco,pub,tv,strada,meeting
+# 2: indoor,outdoor
+# 3: rumoroso,silenzioso
+# 4: silenzio,1 persona,2 persone,gruppo
+# 5: fermo,spostamento
+# 6: note
+#
+auto_01.wav,auto,outdoor,rumoroso,silenzio,spostamento,nicola in panda
