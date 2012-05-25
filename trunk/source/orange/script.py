@@ -4,12 +4,12 @@ if not in_data == None:
     #print classifier
     #print len(in_data)
     
-    first_sample=str(in_data[0][0])[:-3]
+    first_sample=str(in_data[0][0])[:-4]
     select={}
     type=""
     for k in range(len(in_data)):
         i=in_data[k]
-        new_sample=str(i[0])[:-3]
+        new_sample=str(i[0])[:-4]
         #compare the name of sample
         if first_sample != new_sample:   
             first_sample=new_sample
@@ -29,7 +29,7 @@ if not in_data == None:
     lung=len(in_data)
     i=0
     while i < lung:
-        if not "_00" in str(in_data[i][0])[-3:]:
+        if not "_000" in str(in_data[i][0])[-4:]:
             del in_data[i]
             lung =lung - 1
             #print lung
