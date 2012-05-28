@@ -54,36 +54,34 @@ def features_extraction(sample):
 def samples_extraction(fname):
     wav = wave.open(fname, 'r')
     (nchannels, sample_width, sample_rate, n_frames, comptype, compname) = wav.getparams()
-    frames = wav.readframes(n_frames * nchannels)
-    out = struct.unpack_from ("%dh" % n_frames * nchannels, frames)
-    wav.close()
     
     print '  - %s [%dch, %dbits, %dhz, %ds]' % (
         fname, nchannels, sample_width * 8, sample_rate, n_frames / sample_rate)
-    
-    # eventual mono conversion
-    data = np.array([out[i] for i in range(0, len(out), nchannels)])
                
     file_duration = n_frames / sample_rate
     data_point_duration = 1.0 / sample_rate
-    chunk_data_points = config['chunk_duration'] / data_point_duration
-    sample_data_points = config['sample_duration'] / data_point_duration
+    chunk_data_points = int(config['chunk_duration'] / data_point_duration)
+    sample_data_points = int(config['sample_duration'] / data_point_duration)
     n_chunks = int(file_duration / config['chunk_duration'])
     n_sample = config['sample_in_chunk']
 
     samples = []
-    chunk = 0
     
     # TOBEFIXED
     if n_chunks > 100:
-	n_chunks = 100
+        n_chunks = 100
     
+    chunk = 0
     while chunk < n_chunks:
         sample = 0
         while sample < n_sample:
             start_data_point = (n_frames / n_chunks) * chunk
             start_data_point += (chunk_data_points / n_sample) * sample
-            end_data_point = start_data_point + sample_data_points
+            
+            wav.setpos(start_data_point * nchannels)
+            frames = wav.readframes(sample_data_points * nchannels)
+            frames_conv = struct.unpack_from ("%dh" % sample_data_points * nchannels, frames)
+            data = np.array([frames_conv[i] for i in range(0, len(frames_conv), nchannels)])
             
             samples.append({
                 'fname': fname,
@@ -91,11 +89,13 @@ def samples_extraction(fname):
                 'sample_id': sample,
                 'sample_rate' : sample_rate,
                 'sample_width' : sample_width,
-                'data': data[start_data_point:end_data_point],
+                'data': data,
             })
             
             sample += 1
         chunk += 1
+        
+    wav.close()
     return samples
 
 def save_orange(samples):
@@ -116,6 +116,13 @@ def save_orange(samples):
             sample['zcr']))
             
     out_file = open(config['output_filename'] + '.tab', 'w')
+    
+    # header
+    out_file.write('type\tname\tsc\tlefr\tzcr\n')
+    out_file.write('d\td\tc\tc\tc\n')
+    out_file.write('class\n')
+    
+    # body
     out_file.write('\n'.join(outstr))
     out_file.close()
     return
@@ -154,10 +161,7 @@ def main():
                     features_extraction(sample)
                 
                 samples.extend(current)
-                
-                gc.collect()
-                print sys.getsizeof(samples)
-                    
+
     if config['output_format'] == 'orange':
         save_orange(samples)
     else:
