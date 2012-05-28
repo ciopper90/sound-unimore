@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import gc
 import os
 import os.path
 import sys
@@ -153,6 +154,9 @@ def main():
                     features_extraction(sample)
                 
                 samples.extend(current)
+                
+                gc.collect()
+                print sys.getsizeof(samples)
                     
     if config['output_format'] == 'orange':
         save_orange(samples)
