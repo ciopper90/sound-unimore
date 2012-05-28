@@ -10,7 +10,7 @@ from OWBaseWidget import *
 class GUIApplication(OWBaseWidget):
     def __init__(self,parent=None):
         self.signalManager = orngSignalManager.SignalManager()
-        OWBaseWidget.__init__(self, title = 'new_schema', signalManager = self.signalManager)
+        OWBaseWidget.__init__(self, title = 'sound_unimore', signalManager = self.signalManager)
         self.widgets = {}
         self.loadSettings()
         
@@ -20,13 +20,13 @@ class GUIApplication(OWBaseWidget):
         self.resize(800,600)
 
         self.createWidget('OWFile', 'icons/File.png', 'File', 1, self.signalManager)
-	self.createWidget('OWITree', 'icons/ITree.png', 'Interactive Tree Builder', 1, self.signalManager)       
-	#self.createWidget('OWITree', 'icons/ITree.png', 'Interactive Tree Builder', 1, self.signalManager)
+        self.createWidget('OWITree', 'icons/ITree.png', 'Interactive Tree Builder', 1, self.signalManager)
         self.createWidget('OWTestLearners', 'icons/TestLearners.png', 'Test Learners', 1, self.signalManager)
-        #self.createWidget('OWConfusionMatrix', 'icons/ConfusionMatrix.png', 'Confusion Matrix', 1, self.signalManager)
+        #self.createWidget('OWITree', 'icons/ITree.png', 'Interactive Tree Builder', 1, self.signalManager)
+        self.createWidget('OWConfusionMatrix', 'icons/ConfusionMatrix.png', 'Confusion Matrix', 1, self.signalManager)
         #self.createWidget('OWTestLearners', 'icons/TestLearners.png', 'Test Learners', 1, self.signalManager)
         #self.createWidget('OWDataTable', 'icons/DataTable.png', 'Data Table', 1, self.signalManager)
-        self.createWidget('OWConfusionMatrix', 'icons/ConfusionMatrix.png', 'Confusion Matrix', 1, self.signalManager)
+        #self.createWidget('OWConfusionMatrix', 'icons/ConfusionMatrix.png', 'Confusion Matrix', 1, self.signalManager)
         self.createWidget('OWDataTable', 'icons/DataTable.png', 'Data Table', 1, self.signalManager)
         self.createWidget('OWClassificationTree', 'icons/ClassificationTree.png', 'Classification Tree', 1, self.signalManager)
         self.createWidget('OWKNN', 'icons/kNearestNeighbours.png', 'k Nearest Neighbours', 1, self.signalManager)
@@ -93,7 +93,7 @@ class GUIApplication(OWBaseWidget):
 
     def loadSettings(self):
         try:
-            file = open("new_schema.sav", "r")
+            file = open("sound_unimore.sav", "r")
             self.strSettings = cPickle.load(file)
             file.close()
 
@@ -109,7 +109,7 @@ class GUIApplication(OWBaseWidget):
             widget.synchronizeContexts()
             strSettings[name] = widget.saveSettingsStr()
             widget.close()
-        file = open("new_schema.sav", "w")
+        file = open("sound_unimore.sav", "w")
         cPickle.dump(strSettings, file)
         file.close()
 
