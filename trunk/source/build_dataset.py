@@ -64,7 +64,7 @@ def samples_extraction(fname):
     sample_data_points = int(config['sample_duration'] / data_point_duration)
     n_chunks = int(file_duration / config['chunk_duration'])
     n_sample = config['sample_in_chunk']
-
+    
     samples = []
     
     # TOBEFIXED
@@ -78,8 +78,8 @@ def samples_extraction(fname):
             start_data_point = (n_frames / n_chunks) * chunk
             start_data_point += (chunk_data_points / n_sample) * sample
             
-            wav.setpos(start_data_point * nchannels)
-            frames = wav.readframes(sample_data_points * nchannels)
+            wav.setpos(start_data_point)
+            frames = wav.readframes(sample_data_points)
             frames_conv = struct.unpack_from ("%dh" % sample_data_points * nchannels, frames)
             data = np.array([frames_conv[i] for i in range(0, len(frames_conv), nchannels)])
             
