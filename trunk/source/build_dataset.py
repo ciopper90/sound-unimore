@@ -14,7 +14,7 @@ config = {
   'root_directory' : '../dataset/',
   'chunk_duration' : 2,
   'sample_duration' : 0.064,
-  'sample_in_chunk' : 1,
+  'sample_in_chunk' : 3,
   'output_format' : 'orange',
   'output_filename' : 'dataset'
 }
@@ -74,8 +74,8 @@ def samples_extraction(fname):
     chunk = 0
     
     # TOBEFIXED
-    if n_chunks > 150:
-	n_chunks = 150
+    if n_chunks > 100:
+	n_chunks = 100
     
     while chunk < n_chunks:
         sample = 0
