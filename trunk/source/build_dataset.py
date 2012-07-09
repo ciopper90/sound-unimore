@@ -49,9 +49,12 @@ def features_extraction(sample):
         den = den + ((p[i] * p[i]))
         
     sample['sc'] = num / den
+    
+    # entropy
+    compressed = lzw.compress(signal)
     return
 
-def samples_extraction(fname):
+def samples_extraction(root, fname, cname):
     wav = wave.open(fname, 'r')
     (nchannels, sample_width, sample_rate, n_frames, comptype, compname) = wav.getparams()
     
@@ -84,7 +87,9 @@ def samples_extraction(fname):
             data = np.array([frames_conv[i] for i in range(0, len(frames_conv), nchannels)])
             
             samples.append({
+                'root' : root,
                 'fname': fname,
+                'class' : cname,
                 'chunk_id': chunk,
                 'sample_id': sample,
                 'sample_rate' : sample_rate,
@@ -103,51 +108,33 @@ def save_orange(samples):
     for sample in samples:
         filename = os.path.basename(sample['fname'])
         name, ext = os.path.splitext(filename)
-        classname = name.split('_')[0]
-        id = '%s_%s_%s' % (name, 
-            str(sample['chunk_id']).zfill(3), 
-            str(sample['sample_id']).zfill(3))
         
         outstr.append('%s\t%s\t%f\t%f\t%f' % (
-            classname,
-            id,
+            sample['class'],
+            '%s_%s_%s' % (name, str(sample['chunk_id']).zfill(3), str(sample['sample_id']).zfill(3)),
             sample['sc'],
             sample['lefr'],
             sample['zcr']))
             
+    # open output file
     out_file = open(config['output_filename'] + '.tab', 'w')
     
-    # header
+    # write header
     out_file.write('type\tname\tsc\tlefr\tzcr\n')
     out_file.write('d\td\tc\tc\tc\n')
     out_file.write('class\n')
     
-    # body
+    # write body
     out_file.write('\n'.join(outstr))
     out_file.close()
     return
     
 def save_weka(samples):
-    outstr = []
-    for sample in samples:
-        filename = os.path.basename(sample['fname'])
-        name, ext = os.path.splitext(filename)
-        classname = name.split('_')[0]
-        id = '%s_%s_%s' % (name, 
-            str(sample['chunk_id']).zfill(3), 
-            str(sample['sample_id']).zfill(3))
-        
-        outstr.append('%f,%f,%f,%s,%s' % (
-            sample['sc'],
-            sample['lefr'],
-            sample['zcr'],
-            id,
-            classname))
-            
-    out_file = open(config['output_filename'] + '.arff', 'w')
-    out_file.write('\n'.join(outstr))
-    out_file.close()
     return
+
+def get_class_auto(filename):
+    name, ext = os.path.splitext(filename)
+    return name.split('_')[0]
 
 def main():
     samples = []
@@ -155,20 +142,19 @@ def main():
         print 'processing directory %s' % (root,)  
         for fname in files:
             if fname.lower().endswith('.wav'):
-                current = samples_extraction(os.path.join(root, fname))
-                
+                current = samples_extraction(root, fname, get_class_auto(filename))
                 for sample in current:
                     features_extraction(sample)
-                
                 samples.extend(current)
 
     if config['output_format'] == 'orange':
         save_orange(samples)
     else:
         save_weka(samples)
-        
     sys.exit()
+    
 
+        
 if __name__ == '__main__':
   main()
 
