@@ -9,6 +9,8 @@ import struct
 import pprint
 import wave
 
+import entropy
+
 import numpy as np
 
 config = {
@@ -53,6 +55,7 @@ def features_extraction(sample):
     sample['sc'] = num / den
     
     # entropy (lzw)
+    sample['entropy'] = entropy.shannon_entropy(signal)[0]
     return
 
 def samples_extraction(root, fname, cname):
@@ -85,6 +88,7 @@ def samples_extraction(root, fname, cname):
             wav.setpos(start_data_point)
             frames = wav.readframes(sample_data_points)
             frames_conv = struct.unpack_from ("%dh" % sample_data_points * nchannels, frames)
+            # reduces the number of channels to one
             data = np.array([frames_conv[i] for i in range(0, len(frames_conv), nchannels)])
             
             samples.append({
@@ -110,19 +114,20 @@ def save_orange(samples):
         filename = os.path.basename(sample['fname'])
         name, ext = os.path.splitext(filename)
         
-        outstr.append('%s\t%s\t%f\t%f\t%f' % (
+        outstr.append('%s\t%s\t%f\t%f\t%f\t%f' % (
             sample['class'],
             '%s_%s_%s' % (name, str(sample['chunk_id']).zfill(3), str(sample['sample_id']).zfill(3)),
             sample['sc'],
             sample['lefr'],
-            sample['zcr']))
+            sample['zcr'],
+            sample['entropy']))
             
     # open output file
     out_file = open(config['output_filename'] + '.tab', 'w')
     
     # write header
-    out_file.write('type\tname\tsc\tlefr\tzcr\n')
-    out_file.write('d\td\tc\tc\tc\n')
+    out_file.write('type\tname\tsc\tlefr\tzcr\tentropy\n')
+    out_file.write('d\td\tc\tc\tc\tc\n')
     out_file.write('class\n')
     
     # write body
