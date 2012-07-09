@@ -13,7 +13,9 @@ import numpy as np
 
 config = {
   'root_directory' : '../dataset/',
-  'chunk_duration' : 2,
+  'labels_file' : 'labels.csv',
+  'labels_index' : 0,
+  'chunk_duration' : 3,
   'sample_duration' : 0.064,
   'sample_in_chunk' : 3,
   'output_format' : 'orange',
@@ -50,12 +52,11 @@ def features_extraction(sample):
         
     sample['sc'] = num / den
     
-    # entropy
-    compressed = lzw.compress(signal)
+    # entropy (lzw)
     return
 
 def samples_extraction(root, fname, cname):
-    wav = wave.open(fname, 'r')
+    wav = wave.open(os.path.join(root, fname), 'r')
     (nchannels, sample_width, sample_rate, n_frames, comptype, compname) = wav.getparams()
     
     print '  - %s [%dch, %dbits, %dhz, %ds]' % (
@@ -132,20 +133,34 @@ def save_orange(samples):
 def save_weka(samples):
     return
 
-def get_class_auto(filename):
-    name, ext = os.path.splitext(filename)
-    return name.split('_')[0]
-
 def main():
     samples = []
+    
+    # build the filename/class mappings
+    class_map = {}
+    for line in open(os.path.join(config['root_directory'], config['labels_file'])):
+        # skip comments
+        if line[0] == '#': continue
+        classes = line.split(',')
+        fname = classes.pop(0)
+        class_map[fname] = classes
+    
+    # main loop
     for root, dirs, files in os.walk(config['root_directory']):
         print 'processing directory %s' % (root,)  
         for fname in files:
             if fname.lower().endswith('.wav'):
-                current = samples_extraction(root, fname, get_class_auto(filename))
-                for sample in current:
-                    features_extraction(sample)
-                samples.extend(current)
+                try:
+                    current = samples_extraction(
+                        root, 
+                        fname, 
+                        class_map[fname][config['labels_index']])
+                    for sample in current:
+                        features_extraction(sample)
+                    samples.extend(current)
+                except KeyError:
+                    print 'warning: %s not found in dataset\n' % (fname)
+                    
 
     if config['output_format'] == 'orange':
         save_orange(samples)
@@ -153,7 +168,6 @@ def main():
         save_weka(samples)
     sys.exit()
     
-
         
 if __name__ == '__main__':
   main()
