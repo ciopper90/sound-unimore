@@ -3,36 +3,11 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-    <LinearLayout
-            android:id="@+id/linearLayout1"
-    		android:layout_width="fill_parent"
-    		android:layout_height="fill_parent"
-    		android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/ciao"
+    <ListView
+        android:id="@+id/element"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/hello" />
-
-    <Button
-        android:id="@+id/inizio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="inizio" />
-
-    <Button
-        android:id="@+id/fine"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="fine" />
-
-    <Button
-        android:id="@+id/rilascia"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="rilascia" />
-
-</LinearLayout>
+        android:layout_height="fill_parent" >
+    </ListView>
 
 </ScrollView>
