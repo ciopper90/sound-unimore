@@ -7,15 +7,17 @@ import java.util.Map;
 import edu.emory.mathcs.jtransforms.fft.*;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 public class Feature {
 
-	public static int[] feature(byte[] audio,int sample_rate,Context context,int numb){
-		int [][] sample=extract_sample(audio,sample_rate);
+	public static int[] feature(byte[] audio,int sample_rate,Context context,int numb,SharedPreferences pref){
+		int [][] sample=extract_sample(audio,sample_rate,pref);
 		double[][] a=new double[sample.length][2];
 		Object[] c=new Object[3];
 		int [] h=new int[sample.length];
+		
 
 
 		MyDatabase db=new MyDatabase(context);
@@ -49,9 +51,9 @@ public class Feature {
 		return h;
 	}
 
-	private static int[][] extract_sample(byte[] audio,int sample_rate) {
+	private static int[][] extract_sample(byte[] audio,int sample_rate, SharedPreferences pref) {
 		//number of sample
-		int number_sample=3;
+		int number_sample=pref.getInt("q", 3);
 		//time of sample
 		double time=0.064;
 		//number of frame in a sample

@@ -15,8 +15,8 @@ public class Record extends Thread{
 
 	private final int bufferSize;
 	private final AudioRecord audioRecord;
-	private int size=2*24*1024;
-	private final byte[] audioBuffer=new byte[size];
+	private int size;
+	private final byte[] audioBuffer;
 	private int sampleRateInHz=11025;
 	private boolean active;
 	private Context context;
@@ -27,28 +27,20 @@ public class Record extends Thread{
 	SharedPreferences prefs;
 
 	public Record(Context cont,SharedPreferences shared){
+
+		//inizializzazione variabili generali
 		int channelConfig=AudioFormat.CHANNEL_IN_MONO;
 		int audioFormat=AudioFormat.ENCODING_PCM_16BIT;
 		context=cont;
-		//bufferSize = AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat);
-		bufferSize=size;
-		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,sampleRateInHz, channelConfig, audioFormat, bufferSize);
-		n= new AndNotification();
 		prefs = shared;
 
-	}
+		size=prefs.getInt("n", 0)*24*1024;
+		audioBuffer=new byte[size];
 
+		bufferSize=size;
+		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,sampleRateInHz, channelConfig, audioFormat, bufferSize);
+		//n= new AndNotification();
 
-	@Override
-	public void destroy() {
-		active=false;
-		//super.destroy();
-	}
-
-	@Override
-	public synchronized void start() {
-		active=true;
-		super.start();
 	}
 
 	public void run(){
@@ -56,7 +48,8 @@ public class Record extends Thread{
 		byte [][] temp=new byte[(audioBuffer.length/bufferSize)][bufferSize];
 		Log.d("dimensione", (audioBuffer.length/bufferSize) + "");
 		Log.d(bufferSize+"", audioBuffer.length+"");
-		while(active){
+		while(true){
+			long start=System.currentTimeMillis();
 			Log.d("thread", "start record");
 			while(audioBuffer.length>i*bufferSize){
 				audioRecord.startRecording();
@@ -122,16 +115,17 @@ public class Record extends Thread{
 			String [] elemento={"parco","lezione","treno","tv","auto","ristorante","strada"};
 			String scelta=elemento[element];
 
-			if(evento==null){
+			/*/if(evento==null){
 				n.notify(scelta, context);		
 			}else{
 				if(evento!=scelta){
 					n.notify(scelta, context);		
 					evento=scelta;
 				}
-			}
+			}*/
+			long stop=System.currentTimeMillis();
 			try {
-				sleep(10000);
+				sleep((prefs.getInt("m", 10)*1000)-(stop-start));
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
