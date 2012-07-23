@@ -14,7 +14,6 @@ public class Feature {
 
 	public static int[] feature(byte[] audio,int sample_rate,Context context,int numb,SharedPreferences pref){
 		int [][] sample=extract_sample(audio,sample_rate,pref);
-		double[][] a=new double[sample.length][2];
 		Object[] c=new Object[3];
 		int [] h=new int[sample.length];
 		
@@ -25,15 +24,19 @@ public class Feature {
 
 
 		for(int n=0;n<sample.length;n++){
-			a[n][1]=ZeroCrossingRate(sample[n]);
 			c[1]=ZeroCrossingRate(sample[n]);
-			//a[1]=SpectralCentroid(sample[n],sample_rate);
-			a[n][0]=LowEnergyFrameRate(sample[n]);
+			double zcr=(Double) c[1];
+			
 			c[0]=LowEnergyFrameRate(sample[n]);
+			double lefr=(Double) c[0];
+			
 			double centroid=SpectralCentroid(sample[n], sample_rate);
+			
 			c[2]=ShannonEntropy(sample[n]);
-			Log.d("campione "+n, a[n][0]+" "+a[n][1]+ " "+ centroid);//+" "+a[2]);
-			Log.d("shannon",c[2]+"");
+			double entropy=(Double) c[2];
+			
+			//Log.d("campione "+n, a[n][0]+" "+a[n][1]+ " "+ centroid);//+" "+a[2]);
+			//Log.d("shannon",c[2]+"");
 			String [] elemento={"parco","lezione","treno","tv","auto","ristorante","strada"};
 
 			try {
@@ -41,7 +44,7 @@ public class Feature {
 				h[n]=WekaClassifier.classify(c);
 				//Log.d("classify", elemento[h[n]]);
 				//Log.d("data ora", data.getTime().getDate()+"/"+data.getTime().getMonth()+"/"+data.getTime().getYear() +" "+data.getTime().getHours()+":"+data.getTime().getMinutes()+"."+data.getTime().getSeconds());
-				db.insertProduct( elemento[h[n]], n,a[n][1],a[n][0],numb,data.getTime().getDate()+"/"+data.getTime().getMonth()+"/"+data.getTime().getYear(),data.getTime().getHours()+":"+data.getTime().getMinutes()+"."+data.getTime().getSeconds(),centroid);
+				db.insertSample( elemento[h[n]],zcr,lefr,centroid,entropy,numb,n,data.getTime().getDate()+"/"+data.getTime().getMonth()+"/"+data.getTime().getYear(),data.getTime().getHours()+":"+data.getTime().getMinutes()+"."+data.getTime().getSeconds());
 				db.close();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -72,8 +75,6 @@ public class Feature {
 			n=n+frame;
 
 		}
-
-
 		return temp;
 	}
 
@@ -137,6 +138,7 @@ public class Feature {
 		return num/den;
 	}
 	
+	
 	public static double ShannonEntropy(int[] audio) {
 		  Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 		  // count the occurrences of each value
@@ -171,20 +173,4 @@ public class Feature {
 		zcr=zcr/(2*audio.length);
 		return zcr;
 	}
-
-	/*	private static double ZeroCrossingRate2(byte[] audio) {
-		int prima=audio[0];
-		int dopo;
-		double zcr=0;
-		for(int i=1;i<audio.length-1;i++){
-			dopo=audio[i];
-			if(prima*dopo<0)
-				zcr++;
-			prima=dopo;
-		}
-		//zcr=zcr/2;
-		zcr=zcr/audio.length;
-		return zcr;
-	}*/
-
 }
