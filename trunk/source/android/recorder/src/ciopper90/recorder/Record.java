@@ -91,7 +91,7 @@ public class Record extends Thread{
 			Log.d("thread", "end record");
 			Log.d("thread", "start elaborazione");
 			Log.d("thread", "stop elaborazione");
-			int [] d=Feature.feature(audioBuffer,sampleRateInHz,context,textData);			
+			int [] d=Feature.feature(audioBuffer,sampleRateInHz,context,textData,prefs);			
 			//calcolo della media dei 3 vettori
 
 			//istanzio vettore
