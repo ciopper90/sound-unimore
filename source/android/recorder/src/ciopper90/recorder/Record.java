@@ -2,17 +2,22 @@ package ciopper90.recorder;
 
 import java.util.GregorianCalendar;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.os.Handler;
+import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
+import android.widget.SimpleAdapter;
 
 public class Record extends Thread{
 
 	private final int bufferSize;
-	private final AudioRecord audioRecord;
+	private static AudioRecord audioRecord;
 	private int size;
 	private final byte[] audioBuffer;
 	private int sampleRateInHz=11025;
@@ -24,18 +29,19 @@ public class Record extends Thread{
 	SharedPreferences prefs;
 	private int[][] sample_value;
 	private MyDatabase db;
-	GregorianCalendar data_start,data_end; 
+	GregorianCalendar data_start,data_end;
+	private Handler handler;
 
 
 
-	public Record(Context cont,SharedPreferences shared){
+	public Record(Context cont,SharedPreferences shared,Handler handler){
 
 		//inizializzazione variabili generali
 		int channelConfig=AudioFormat.CHANNEL_IN_MONO;
 		int audioFormat=AudioFormat.ENCODING_PCM_16BIT;
 		context=cont;
 		prefs = shared;
-
+		this.handler = handler;
 		size=prefs.getInt("n", 0)*24*1024;
 		audioBuffer=new byte[size];
 		sample_value=new int[prefs.getInt("h", 60)/prefs.getInt("m", 10)][];
@@ -49,6 +55,7 @@ public class Record extends Thread{
 	}
 
 	public void run(){
+		long time=0;
 		int i=0,k=0;
 		byte [][] temp=new byte[(audioBuffer.length/bufferSize)][bufferSize];
 		Log.d("dimensione", (audioBuffer.length/bufferSize) + "");
@@ -57,7 +64,7 @@ public class Record extends Thread{
 			if(k==0)
 				data_start= new GregorianCalendar();
 			long start=System.currentTimeMillis();
-			Log.d("thread", "start record");
+			//Log.d("thread", "start record");
 			while(audioBuffer.length>i*bufferSize){
 				audioRecord.startRecording();
 				audioRecord.read(temp[i], 0, bufferSize);
@@ -92,9 +99,9 @@ public class Record extends Thread{
 
 
 			i=0;
-			Log.d("thread", "end record");
-			Log.d("thread", "start elaborazione");
-			Log.d("thread", "stop elaborazione");
+			//Log.d("thread", "end record");
+			//Log.d("thread", "start elaborazione");
+			//Log.d("thread", "stop elaborazione");
 			sample_value[k]=Feature.feature(audioBuffer,sampleRateInHz,context,textData,prefs);			
 
 
@@ -110,14 +117,13 @@ public class Record extends Thread{
 				}
 			}*/
 			long stop=System.currentTimeMillis();
-			try {
-				sleep((prefs.getInt("m", 10)*1000)-(stop-start));
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			//Log.d("tempo", stop-start+"");
+			Log.d("time", time+"");
+			SystemClock.sleep((prefs.getInt("m", 10)*1000)-(stop-start));
+			time=time+10;
 			k++;
 			if(k==sample_value.length){
+				Log.d("time", time+"");
 				//data_end= new GregorianCalendar();
 				//calcolo della media dei 3 vettori
 				//istanzio vettore
@@ -141,24 +147,31 @@ public class Record extends Thread{
 					}
 				}
 				db.open();
-
-				String inizio=data_start.getTime().getHours()+":"+data_start.getTime().getMinutes();
-				//String fine=data_end.getTime().getHours()+data_end.getTime().getMinutes()+"";
+				String inizio="";
+				if(data_start.getTime().getMinutes()<=9){
+					inizio=data_start.getTime().getHours()+":0"+data_start.getTime().getMinutes();
+				}else{
+					inizio=data_start.getTime().getHours()+":"+data_start.getTime().getMinutes();
+				}//String fine=data_end.getTime().getHours()+data_end.getTime().getMinutes()+"";
 				textData= prefs.getInt(TEXT_DATA_KEY, 0);
 				SharedPreferences.Editor editor = prefs.edit();
 				// Lo salviamo nelle Preferences
 				editor.putInt(TEXT_DATA_KEY, textData+1);
 				editor.commit();
 				double percentuale=((double) max)/(sample_value.length*sample_value[0].length);
-				if(percentuale>0.5){
+				if(percentuale>=0.5){
 					db.insertEvent(elemento[element], textData, percentuale, inizio);
-				}
-				else{
+				}else{
 					//scrivi unknown
 					db.insertEvent("unknown", textData, percentuale, inizio);
 				}
 				db.close();
 				k=0;
+				time=0;
+				Message msg;
+				msg = Message.obtain();
+				msg.what = 1;                     
+				handler.sendMessage(msg);
 			}
 		}
 	}
