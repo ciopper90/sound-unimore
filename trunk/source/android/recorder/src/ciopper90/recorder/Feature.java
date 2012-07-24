@@ -79,7 +79,7 @@ public class Feature {
 	}
 
 	private static double LowEnergyFrameRate(int[] audio) {
-		Log.d("a", audio.length+"");
+		//Log.d("a", audio.length+"");
 		double sum=0;
 		for(int i=0;i<audio.length-1;i++)
 			sum=sum+(Math.pow(audio[i],2));

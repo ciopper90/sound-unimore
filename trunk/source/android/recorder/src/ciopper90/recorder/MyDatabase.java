@@ -58,7 +58,7 @@ public class MyDatabase {
 	}
 
 	public Cursor fetchEvents(){ //metodo per fare la query di tutti i dati
-		return mDb.query(ProductsMetaData.TABLE_EVENT, null,null,null,null,null,"id desc");                            
+		return mDb.query(ProductsMetaData.TABLE_EVENT, null,null,null,null,null,"fragment desc");                            
 	}
 
 	static class ProductsMetaData {  // i metadati della tabella, accessibili ovunque
