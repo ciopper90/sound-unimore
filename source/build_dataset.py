@@ -25,42 +25,6 @@ config = {
   'output_filename' : 'dataset'
 }
 
-def features_extraction_numpy(sample):
-    sample_rate = sample['sample_rate']
-    sample_width = sample['sample_width']
-    signal = sample['data']
-    
-    # zero crossing rate
-    sample['zcr'] = float(audioop.cross(signal, sample_width)) / len(signal)
-    
-    
-    # low energy frame rate
-    rms = audioop.rms(signal, sample_width) / 2    
-    lefr = 0
-    for data_point in signal:
-        if data_point < rms: 
-            lefr += 1
-    sample['lefr'] = lefr
-
-    
-    # spectral centroid
-    p = np.abs(np.fft.rfft(signal))
-    f = np.linspace(0, sample_rate / 2.0, len(p))
-    
-    num = den = 0.0
-    for i in range(len(f)):
-        num = num + (i * (p[i] * p[i]))
-    for i in range(len(f)):
-        den = den + ((p[i] * p[i]))
-        
-    sample['sc'] = num / den
-    
-    # entropy (lzw)
-    sample['entropy'] = entropy.shannon_entropy(signal)[0]
-    return
-
-
-
 def features_extraction(sample):
     sample_rate = sample['sample_rate']
     sample_width = sample['sample_width']
@@ -74,6 +38,7 @@ def features_extraction(sample):
         zcr = zcr + np.abs(cmp(after, 0) - cmp(before, 0))
         before = after
     sample['zcr'] = float(zcr) / (2 * len(signal))
+
 
     # low energy frame rate
     sum = 0;
@@ -113,6 +78,7 @@ def features_extraction(sample):
         result -= frequency * (math.log10(frequency) / math.log10(2))
     sample['entropy'] = result
     return
+
 
 def samples_extraction(root, fname, cname):
     wav = wave.open(os.path.join(root, fname), 'r')
