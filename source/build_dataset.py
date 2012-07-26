@@ -25,6 +25,7 @@ config = {
   'output_filename' : 'dataset'
 }
 
+
 def features_extraction(sample):
     sample_rate = sample['sample_rate']
     sample_width = sample['sample_width']
@@ -62,7 +63,7 @@ def features_extraction(sample):
     for i in range(len(f)):
         den = den + ((p[i] * p[i]))
     sample['sc'] = num / den
-    
+
 
     # entropy
     map = {}
@@ -91,6 +92,7 @@ def samples_extraction(root, fname, cname):
     data_point_duration = 1.0 / sample_rate
     chunk_data_points = int(config['chunk_duration'] / data_point_duration)
     sample_data_points = int(config['sample_duration'] / data_point_duration)
+    
     n_chunks = int(file_duration / config['chunk_duration'])
     n_sample = config['sample_in_chunk']
     
