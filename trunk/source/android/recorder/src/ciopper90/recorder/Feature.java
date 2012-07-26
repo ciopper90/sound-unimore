@@ -3,12 +3,9 @@ package ciopper90.recorder;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
-
 import edu.emory.mathcs.jtransforms.fft.*;
-
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 public class Feature {
 
