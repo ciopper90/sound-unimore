@@ -1,21 +1,17 @@
 package ciopper90.recorder;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -31,7 +27,6 @@ public class Main extends Activity {
 	private Handler mHandler;
 
 
-	//public static SimpleAdapter adapter;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -51,27 +46,18 @@ public class Main extends Activity {
 		editor.commit();	
 		db=new MyDatabase(this.getApplicationContext());
 		if(work==null){
-			mHandler = new Handler() {
-				@Override
-				public void handleMessage(Message msg) {
-					aggiornalist();
-				}
-			};
-			work=new Record(getApplicationContext(),prefs,mHandler);
+			work=new Record(getApplicationContext(),prefs);
 			work.start();
 		}
-		/*Runnable mUpdateTimeTask = new Runnable() {
+		Runnable mUpdateTimeTask = new Runnable() {
 			public void run() {
-				// Log.v("cicla ogni 2 sec");
-				aggiornalist(); //questa funzione mi fa il parsing e mi popola il listAdapter
-				//setListAdapter(adapter);
-				mHandler.postDelayed(this, 10000);
+				aggiornalist();
+				mHandler.postDelayed(this, 60000);
 			} 
 		};
 		mHandler=new Handler();
-		mHandler.postDelayed(mUpdateTimeTask, 20000);*/
+		mHandler.postDelayed(mUpdateTimeTask, 5000);
 		aggiornalist();
-
 	}   
 
 	public void aggiornalist() {
@@ -83,8 +69,6 @@ public class Main extends Activity {
 			ListEvent=new ArrayList<Event>();
 		}
 		ListEvent=unione(ListEvent);
-
-
 		//Questa è la lista che rappresenta la sorgente dei dati della listview
 		//ogni elemento è una mappa(chiave->valore)
 		ArrayList<HashMap<String, String>> data=new ArrayList<HashMap<String,String>>();
@@ -102,7 +86,6 @@ public class Main extends Activity {
 			data.add(ServiceMap);  //aggiungiamo la mappa di valori alla sorgente dati
 		}
 
-
 		String[] from={"evento","tempo"}; //dai valori contenuti in queste chiavi
 		int[] to={R.id.classify,R.id.time};//agli id delle view
 
@@ -118,8 +101,6 @@ public class Main extends Activity {
 		listView=(ListView)findViewById(R.id.element);
 		//listView.invalidate();
 	}
-
-
 
 	private ArrayList<Event> unione(ArrayList<Event> list) {
 		int k=0;
@@ -185,3 +166,4 @@ public class Main extends Activity {
 
 
 }
+
