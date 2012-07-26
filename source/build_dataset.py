@@ -8,23 +8,24 @@ import audioop
 import struct
 import pprint
 import wave
+import math
 
 import entropy
 
 import numpy as np
 
 config = {
-  'root_directory' : '../dataset/',
+  'root_directory' : '../dataset/testset/',
   'labels_file' : 'labels.csv',
   'labels_index' : 0,
   'chunk_duration' : 3,
   'sample_duration' : 0.064,
   'sample_in_chunk' : 3,
-  'output_format' : 'orange',
+  'output_format' : 'weka',
   'output_filename' : 'dataset'
 }
 
-def features_extraction(sample):
+def features_extraction_numpy(sample):
     sample_rate = sample['sample_rate']
     sample_width = sample['sample_width']
     signal = sample['data']
@@ -56,6 +57,61 @@ def features_extraction(sample):
     
     # entropy (lzw)
     sample['entropy'] = entropy.shannon_entropy(signal)[0]
+    return
+
+
+
+def features_extraction(sample):
+    sample_rate = sample['sample_rate']
+    sample_width = sample['sample_width']
+    signal = sample['data']
+    
+    # zero crossing rate
+    zcr = 0
+    before = signal[0]    
+    for i in range(1, len(signal)):
+        after = signal[i]
+        zcr = zcr + np.abs(cmp(after, 0) - cmp(before, 0))
+        before = after
+    sample['zcr'] = float(zcr) / (2 * len(signal))
+
+    # low energy frame rate
+    sum = 0;
+    for i in range(len(signal)):
+        sum = sum + (math.pow(signal[i], 2))
+    sum = sum / len(signal)
+    rms = math.sqrt(sum) / 2
+    lefr = 0
+    for i in range(len(signal)):
+        if(signal[i] < rms):
+            lefr += 1
+    sample['lefr'] = lefr
+
+    
+    # spectral centroid
+    p = np.abs(np.fft.rfft(signal))
+    f = np.linspace(0, sample_rate / 2.0, len(p))
+    num = den = 0.0
+    for i in range(len(f)):
+        num = num + (i * (p[i] * p[i]))
+    for i in range(len(f)):
+        den = den + ((p[i] * p[i]))
+    sample['sc'] = num / den
+    
+
+    # entropy
+    map = {}
+    for i in range(0, len(signal)):
+        try :
+            map[signal[i]] = map[signal[i]] + 1
+        except KeyError:
+            map[signal[i]] = 1
+    
+    result = 0.0
+    for i in map.keys():
+        frequency = float(map[i]) / len(signal)
+        result -= frequency * (math.log10(frequency) / math.log10(2))
+    sample['entropy'] = result
     return
 
 def samples_extraction(root, fname, cname):
@@ -136,6 +192,36 @@ def save_orange(samples):
     return
     
 def save_weka(samples):
+    outstr = []
+    for sample in samples:
+        filename = os.path.basename(sample['fname'])
+        name, ext = os.path.splitext(filename)
+        
+        outstr.append('%f,%f,%f,%f,%s,%s' % (
+            sample['sc'],
+            sample['lefr'],
+            sample['zcr'],
+            sample['entropy'],
+            '%s_%s_%s' % (name, str(sample['chunk_id']).zfill(3), str(sample['sample_id']).zfill(3)),
+            sample['class'],            
+            ))
+            
+    # open output file
+    out_file = open(config['output_filename'] + '.arff', 'w')
+    
+    # write header
+    out_file.write('@relation \'dataset\'\n\n')
+    out_file.write('@attribute sc numeric\n')
+    out_file.write('@attribute lefr numeric\n')
+    out_file.write('@attribute zcr numeric\n')
+    out_file.write('@attribute entropy numeric\n')
+    out_file.write('@attribute name string\n')
+    out_file.write('@attribute class {parco,lezione,treno,tv,auto,ristorante,strada}\n\n')
+    out_file.write('@data\n')
+    
+    # write body
+    out_file.write('\n'.join(outstr))
+    out_file.close()
     return
 
 def main():
