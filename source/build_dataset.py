@@ -14,18 +14,6 @@ import entropy
 
 import numpy as np
 
-config = {
-  'root_directory' : '../dataset/testset/',
-  'labels_file' : 'labels.csv',
-  'labels_index' : 0,
-  'chunk_duration' : 3,
-  'sample_duration' : 0.064,
-  'sample_in_chunk' : 3,
-  'output_format' : 'weka',
-  'output_filename' : 'dataset'
-}
-
-
 def features_extraction(sample):
     sample_rate = sample['sample_rate']
     sample_width = sample['sample_width']
@@ -132,6 +120,7 @@ def samples_extraction(root, fname, cname):
     wav.close()
     return samples
 
+
 def save_orange(samples):
     outstr = []
     for sample in samples:
@@ -158,6 +147,7 @@ def save_orange(samples):
     out_file.write('\n'.join(outstr))
     out_file.close()
     return
+    
     
 def save_weka(samples):
     outstr = []
@@ -191,6 +181,29 @@ def save_weka(samples):
     out_file.write('\n'.join(outstr))
     out_file.close()
     return
+    
+    
+def save_raw(samples):
+    outstr = []
+
+    for sample in samples:
+        filename = os.path.basename(sample['fname'])
+        name, ext = os.path.splitext(filename)
+
+        data = map(str, sample['data'])
+        outstr.append('%s,%s,%s' % (
+            ' '.join(data),
+            '%s_%s_%s' % (name, str(sample['chunk_id']).zfill(3), str(sample['sample_id']).zfill(3)),
+            sample['class'],            
+            ))
+
+    # open output file
+    out_file = open(config['output_filename'] + '.raw', 'w')
+
+    # write body
+    out_file.write('\n'.join(outstr))
+    out_file.close()
+    return
 
 def main():
     samples = []
@@ -220,14 +233,23 @@ def main():
                 except KeyError:
                     print 'warning: %s not found in dataset\n' % (fname)
                     
-
-    if config['output_format'] == 'orange':
-        save_orange(samples)
-    else:
-        save_weka(samples)
+    # save output
+    config['output_map'][config['output_format']](samples)
     sys.exit()
     
-        
+    
+config = {
+  'root_directory' : '../dataset/testset/',
+  'labels_file' : 'labels.csv',
+  'labels_index' : 0,
+  'chunk_duration' : 3,
+  'sample_duration' : 0.064,
+  'sample_in_chunk' : 3,
+  'output_format' : 'raw',
+  'output_map' : {'orange' : save_orange, 'weka' : save_weka, 'raw' : save_raw},
+  'output_filename' : 'dataset'
+}
+
 if __name__ == '__main__':
   main()
 
