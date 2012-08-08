@@ -80,7 +80,7 @@ public class Main extends Activity {
 
 			ServiceMap=new HashMap<String, String>();//creiamo una mappa di valori
 
-			ServiceMap.put("evento", e.getEvento()+" ( "+e.getPerc()+" )"); // per la chiave image, inseriamo la risorsa dell immagine
+			ServiceMap.put("evento", e.getEvento()+" ( "+e.getPerc()+"% )"); // per la chiave image, inseriamo la risorsa dell immagine
 			ServiceMap.put("tempo", e.getInizio()+" - "+e.getFine());
 
 			data.add(ServiceMap);  //aggiungiamo la mappa di valori alla sorgente dati
