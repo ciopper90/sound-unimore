@@ -1,5 +1,9 @@
 package ciopper90.recorder;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.GregorianCalendar;
 
 import android.content.Context;
@@ -26,7 +30,7 @@ public class Record extends Thread{
 	private int[][] sample_value;
 	private MyDatabase db;
 	GregorianCalendar data_start,data_end;
-	
+
 
 
 	public Record(Context cont,SharedPreferences shared){
@@ -49,6 +53,7 @@ public class Record extends Thread{
 	}
 
 	public void run(){
+		int textData = 0;
 		long time=0;
 		int i=0,k=0;
 		byte [][] temp=new byte[(audioBuffer.length/bufferSize)][bufferSize];
@@ -69,27 +74,37 @@ public class Record extends Thread{
 				int indice=a/bufferSize;
 				audioBuffer[a]=temp[indice][a-indice*bufferSize];				
 			}	
-			int textData = 0;
 			// Leggiamo l'informazione associata alla proprietà TEXT_DATA
 			/*textData= prefs.getInt(TEXT_DATA_KEY, 0);
 			if(k==0){
 				primo=textData;
-			}
+			}*/
 			// create a File object for the parent directory
-				File wallpaperDirectory = new File("/sdcard/reco/");
-				// have the object build the directory structure, if needed.
-				wallpaperDirectory.mkdirs();
-				// create a File object for the output file
-				File outputFile = new File(wallpaperDirectory, textData+".raw");
-				// now attach the OutputStream to the file object, instead of a String representation
-				FileOutputStream fos = new FileOutputStream(outputFile);
+			File wallpaperDirectory = new File("/sdcard/reco/");
+			// have the object build the directory structure, if needed.
+			wallpaperDirectory.mkdirs();
+			// create a File object for the output file
+			File outputFile = new File(wallpaperDirectory, textData+".raw");
+			// now attach the OutputStream to the file object, instead of a String representation
+			FileOutputStream fos;
+			try {
+				fos = new FileOutputStream(outputFile);
+
 				fos.write(audioBuffer);
 				fos.flush();
 				fos.close();
-			SharedPreferences.Editor editor = prefs.edit();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			/*SharedPreferences.Editor editor = prefs.edit();
 			// Lo salviamo nelle Preferences
 			editor.putInt(TEXT_DATA_KEY, ++textData);
-			editor.commit();*/
+			editor.commit();//*/ catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			textData++;
 
 
 			i=0;
@@ -149,15 +164,15 @@ public class Record extends Thread{
 				textData= prefs.getInt(TEXT_DATA_KEY, 0);
 				SharedPreferences.Editor editor = prefs.edit();
 				// Lo salviamo nelle Preferences
-				editor.putInt(TEXT_DATA_KEY, textData+1);
+				editor.putInt(TEXT_DATA_KEY, ++textData);
 				editor.commit();
 				double percentuale=((double) max)/(sample_value.length*sample_value[0].length);
-				if(percentuale>=0.5){
-					db.insertEvent(elemento[element], textData, percentuale, inizio);
-				}else{
-					//scrivi unknown
-					db.insertEvent("unknown", textData, percentuale, inizio);
-				}
+				//if(percentuale>=0.5){
+				db.insertEvent(elemento[element], textData, (int) (percentuale*100), inizio);
+				//}else{
+				//scrivi unknown
+				//	db.insertEvent("unknown", textData, percentuale, inizio);
+				//}
 				db.close();
 				k=0;
 				time=0;           

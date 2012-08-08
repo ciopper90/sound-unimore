@@ -11,7 +11,7 @@ public class Feature {
 
 	public static int[] feature(byte[] audio,int sample_rate,Context context,int numb,SharedPreferences pref){
 		int [][] sample=extract_sample(audio,sample_rate,pref);
-		Object[] c=new Object[3];
+		Object[] c=new Object[4];
 		int [] h=new int[sample.length];
 		
 
@@ -21,16 +21,17 @@ public class Feature {
 
 
 		for(int n=0;n<sample.length;n++){
-			c[1]=ZeroCrossingRate(sample[n]);
-			double zcr=(Double) c[1];
+			c[2]=ZeroCrossingRate(sample[n]);
+			double zcr=(Double) c[2];
 			
-			c[0]=LowEnergyFrameRate(sample[n]);
-			double lefr=(Double) c[0];
+			c[1]=LowEnergyFrameRate(sample[n]);
+			double lefr=(Double) c[1];
+		    
+			c[0]=SpectralCentroid(sample[n], sample_rate);
+			double centroid=(Double) c[0];
 			
-			double centroid=SpectralCentroid(sample[n], sample_rate);
-			
-			c[2]=ShannonEntropy(sample[n]);
-			double entropy=(Double) c[2];
+			c[3]=ShannonEntropy(sample[n]);
+			double entropy=(Double) c[3];
 			
 			//Log.d("campione "+n, a[n][0]+" "+a[n][1]+ " "+ centroid);//+" "+a[2]);
 			//Log.d("shannon",c[2]+"");
@@ -38,7 +39,7 @@ public class Feature {
 
 			try {
 				db.open();  //apriamo il db
-				h[n]=WekaClassifier.classify(c);
+				h[n]=WekaClassifier1.classify(c);
 				//Log.d("classify", elemento[h[n]]);
 				//Log.d("data ora", data.getTime().getDate()+"/"+data.getTime().getMonth()+"/"+data.getTime().getYear() +" "+data.getTime().getHours()+":"+data.getTime().getMinutes()+"."+data.getTime().getSeconds());
 				db.insertSample( elemento[h[n]],zcr,lefr,centroid,entropy,numb,n,data.getTime().getDate()+"/"+data.getTime().getMonth()+"/"+data.getTime().getYear(),data.getTime().getHours()+":"+data.getTime().getMinutes()+"."+data.getTime().getSeconds());
