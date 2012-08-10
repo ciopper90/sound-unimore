@@ -10,10 +10,9 @@ import java.util.HashMap;
 
 public class Main {
 	public static void main(String args[]){
-		//File f=new File("d:\\data.raw");
 		HashMap<Integer, Sample> m=new HashMap<Integer, Sample>();
 		try {
-			Reader t=new FileReader("d:\\data.raw");
+			Reader t=new FileReader("dataset.raw");
 			BufferedReader b=new BufferedReader(t);
 			String c="";
 			int i=0;
@@ -33,7 +32,7 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		String out="";
+		String out="@relation 'dataset'\n@attribute sc real\n@attribute lefr real\n@attribute zcr real\n@attribute entropy real\n@attribute name string\n@attribute class {parco,lezione,treno,tv,auto,ristorante,strada}\n@data";
 		for(int i=0;i<m.size();i++){
 			Sample c=(Sample) m.get(i);
 			//System.out.println(c.getName());
@@ -41,12 +40,13 @@ public class Main {
 			out=out.concat(d[0]+","+d[1]+","+d[2]+","+d[3]+","+c.getName()+","+c.getClasse()+"\n");
 		}
 		try {
-			BufferedWriter wri=new BufferedWriter(new FileWriter("d:\\test.arff"));
+			BufferedWriter wri=new BufferedWriter(new FileWriter("dataset.arff"));
 			wri.write(out);
 			wri.flush();
 			wri.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			//sleep(10000);
 			e.printStackTrace();
 		}
 		
