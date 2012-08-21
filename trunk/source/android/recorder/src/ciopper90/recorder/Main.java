@@ -36,11 +36,11 @@ public class Main extends Activity {
 		SharedPreferences.Editor editor = prefs.edit();
 		// Lo salviamo nelle Preferences
 		//lunghezza campione
-		editor.putInt("n", 2);
+		editor.putInt("n", 3);
 		//tempo tra due acquisizioni
 		editor.putInt("m", 10);
 		//sample per campione
-		editor.putInt("q", 3);
+		editor.putInt("q", 4);
 		//tempo tra due campionamenti diversi
 		editor.putInt("h", 60);
 		editor.commit();	

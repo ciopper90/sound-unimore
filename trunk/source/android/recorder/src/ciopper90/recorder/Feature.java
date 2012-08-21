@@ -39,7 +39,7 @@ public class Feature {
 
 			try {
 				db.open();  //apriamo il db
-				h[n]=WekaClassifier1.classify(c);
+				h[n]=WekaClassifier2.classify(c);
 				//Log.d("classify", elemento[h[n]]);
 				//Log.d("data ora", data.getTime().getDate()+"/"+data.getTime().getMonth()+"/"+data.getTime().getYear() +" "+data.getTime().getHours()+":"+data.getTime().getMinutes()+"."+data.getTime().getSeconds());
 				db.insertSample( elemento[h[n]],zcr,lefr,centroid,entropy,numb,n,data.getTime().getDate()+"/"+data.getTime().getMonth()+"/"+data.getTime().getYear(),data.getTime().getHours()+":"+data.getTime().getMinutes()+"."+data.getTime().getSeconds());

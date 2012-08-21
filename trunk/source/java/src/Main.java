@@ -32,7 +32,7 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		String out="@relation 'dataset'\n@attribute sc real\n@attribute lefr real\n@attribute zcr real\n@attribute entropy real\n@attribute name string\n@attribute class {parco,lezione,treno,tv,auto,ristorante,strada}\n@data";
+		String out="@relation 'dataset'\n@attribute sc real\n@attribute lefr real\n@attribute zcr real\n@attribute entropy real\n@attribute name string\n@attribute class {parco,lezione,treno,tv,auto,ristorante,strada}\n@data\n\n";
 		for(int i=0;i<m.size();i++){
 			Sample c=(Sample) m.get(i);
 			//System.out.println(c.getName());
