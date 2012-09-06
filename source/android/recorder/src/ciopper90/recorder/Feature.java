@@ -9,17 +9,18 @@ import android.content.SharedPreferences;
 
 public class Feature {
 
-	public static int[] feature(byte[] audio,int sample_rate,Context context,int numb,SharedPreferences pref){
+	public static int[] extractFeature(byte[] audio,int sample_rate,Context context,int numb,SharedPreferences pref){
+		//extract sample
 		int [][] sample=extract_sample(audio,sample_rate,pref);
 		Object[] c=new Object[4];
-		int [] h=new int[sample.length];
+		int [] value_sample=new int[sample.length];
 		
 
 
 		MyDatabase db=new MyDatabase(context);
 		GregorianCalendar data= new GregorianCalendar(); 
 
-
+		//extract feature
 		for(int n=0;n<sample.length;n++){
 			c[2]=ZeroCrossingRate(sample[n]);
 			double zcr=(Double) c[2];
@@ -33,23 +34,21 @@ public class Feature {
 			c[3]=ShannonEntropy(sample[n]);
 			double entropy=(Double) c[3];
 			
-			//Log.d("campione "+n, a[n][0]+" "+a[n][1]+ " "+ centroid);//+" "+a[2]);
-			//Log.d("shannon",c[2]+"");
 			String [] elemento={"parco","lezione","treno","tv","auto","ristorante","strada"};
 
 			try {
-				db.open();  //apriamo il db
-				h[n]=WekaClassifier2.classify(c);
-				//Log.d("classify", elemento[h[n]]);
-				//Log.d("data ora", data.getTime().getDate()+"/"+data.getTime().getMonth()+"/"+data.getTime().getYear() +" "+data.getTime().getHours()+":"+data.getTime().getMinutes()+"."+data.getTime().getSeconds());
-				db.insertSample( elemento[h[n]],zcr,lefr,centroid,entropy,numb,n,data.getTime().getDate()+"/"+data.getTime().getMonth()+"/"+data.getTime().getYear(),data.getTime().getHours()+":"+data.getTime().getMinutes()+"."+data.getTime().getSeconds());
+				db.open();
+				//classify sample
+				value_sample[n]=WekaClassifier2.classify(c);
+				//save sample in db
+				db.insertSample( elemento[value_sample[n]],zcr,lefr,centroid,entropy,numb,n,data.getTime().getDate()+"/"+data.getTime().getMonth()+"/"+data.getTime().getYear(),data.getTime().getHours()+":"+data.getTime().getMinutes()+"."+data.getTime().getSeconds());
 				db.close();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		return h;
+		return value_sample;
 	}
 
 	private static int[][] extract_sample(byte[] audio,int sample_rate, SharedPreferences pref) {
@@ -65,6 +64,7 @@ public class Feature {
 		int frame=audio.length/number_sample;
 		audio[1]=-1;
 		for(int i=0;i<number_sample;i++){
+			//trasform a 8 bit sample in a 16 bit sample
 			for(int k=0;k<number_rate;k++){
 				temp[i][k]=audio[n+1];//+1 e la parte + alta
 				temp[i][k]=(temp[i][k]<<8)+audio[n];
@@ -77,7 +77,6 @@ public class Feature {
 	}
 
 	private static double LowEnergyFrameRate(int[] audio) {
-		//Log.d("a", audio.length+"");
 		double sum=0;
 		for(int i=0;i<audio.length-1;i++)
 			sum=sum+(Math.pow(audio[i],2));
@@ -172,3 +171,22 @@ public class Feature {
 		return zcr;
 	}
 }
+
+class Linspace {
+    private float current;
+    private final float end;
+    private final float step;
+    public Linspace(float start, float end, int totalCount) {
+        this.current=start;
+        this.end=end;
+        this.step=(end - start) / totalCount;
+    }
+    public boolean hasNext() {
+        return current < (end + step/2); //MAY stop floating point error
+    }
+    public float getNextFloat() {
+        current+=step;
+        return current;
+    }
+}
+

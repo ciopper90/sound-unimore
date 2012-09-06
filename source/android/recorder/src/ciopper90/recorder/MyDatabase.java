@@ -12,7 +12,7 @@ public class MyDatabase {
 	SQLiteDatabase mDb;
 	DbHelper mDbHelper;
 	Context mContext;
-	private static final String DB_NAME="testapp";//nome del db
+	private static final String DB_NAME="data.db";//nome del db
 	private static final int DB_VERSION=1; //numero di versione del nostro db
 
 	public MyDatabase(Context ctx){
@@ -28,11 +28,6 @@ public class MyDatabase {
 	public void close(){ //chiudiamo il database su cui agiamo
 		mDb.close();
 	}
-
-
-	//i seguenti 2 metodi servono per la lettura/scrittura del db. aggiungete e modificate a discrezione
-	// consiglio:si potrebbe creare una classe Prodotto, i quali oggetti verrebbero passati come parametri dei seguenti metodi, rispettivamente ritornati. Lacio a voi il divertimento
-
 
 	public void insertSample(String name,double zcr,double lefr,double sc,double entropy,int number,int number_sample,String date,String hour){ //metodo per inserire i dati
 		ContentValues cv=new ContentValues();
