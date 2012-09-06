@@ -1,9 +1,5 @@
 package ciopper90.recorder;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.GregorianCalendar;
 
 import android.content.Context;
@@ -22,8 +18,6 @@ public class Record extends Thread{
 	private final byte[] audioBuffer;
 	private int sampleRateInHz=11025;
 	private Context context;
-	//private String evento;
-	//private AndNotification n;
 	// Costante relativa al nome della particolare preferenza
 	private final static String TEXT_DATA_KEY = "number";
 	SharedPreferences prefs;
@@ -46,7 +40,6 @@ public class Record extends Thread{
 
 		bufferSize=size;
 		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,sampleRateInHz, channelConfig, audioFormat, bufferSize);
-		//n= new AndNotification();
 		db=new MyDatabase(cont);
 
 
@@ -63,55 +56,24 @@ public class Record extends Thread{
 			if(k==0)
 				data_start= new GregorianCalendar();
 			long start=System.currentTimeMillis();
-			//Log.d("thread", "start record");
+			//start audio record
 			while(audioBuffer.length>i*bufferSize){
 				audioRecord.startRecording();
 				audioRecord.read(temp[i], 0, bufferSize);
 				audioRecord.stop();
 				i++;
 			}
+			//finish audio record
+			//trasportare i byte letti in un unico vettore
 			for(int a=0;a<audioBuffer.length;a++){
 				int indice=a/bufferSize;
 				audioBuffer[a]=temp[indice][a-indice*bufferSize];				
-			}	
-			// Leggiamo l'informazione associata alla proprietà TEXT_DATA
-			/*textData= prefs.getInt(TEXT_DATA_KEY, 0);
-			if(k==0){
-				primo=textData;
-			}*/
-			// create a File object for the parent directory
-			File wallpaperDirectory = new File("/sdcard/reco/");
-			// have the object build the directory structure, if needed.
-			wallpaperDirectory.mkdirs();
-			// create a File object for the output file
-			File outputFile = new File(wallpaperDirectory, textData+".raw");
-			// now attach the OutputStream to the file object, instead of a String representation
-			FileOutputStream fos;
-			try {
-				fos = new FileOutputStream(outputFile);
-
-				fos.write(audioBuffer);
-				fos.flush();
-				fos.close();
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
-			/*SharedPreferences.Editor editor = prefs.edit();
-			// Lo salviamo nelle Preferences
-			editor.putInt(TEXT_DATA_KEY, ++textData);
-			editor.commit();//*/ catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			textData++;
-
-
+			
+			
 			i=0;
-			//Log.d("thread", "end record");
-			//Log.d("thread", "start elaborazione");
-			//Log.d("thread", "stop elaborazione");
-			sample_value[k]=Feature.feature(audioBuffer,sampleRateInHz,context,textData,prefs);			
+			//start elaborazione
+			sample_value[k]=Feature.extractFeature(audioBuffer,sampleRateInHz,context,textData,prefs);			
 
 
 			String [] elemento={"parco","lezione","treno","tv","auto","ristorante","strada"};
