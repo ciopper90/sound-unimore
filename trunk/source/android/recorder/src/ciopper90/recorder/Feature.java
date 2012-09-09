@@ -14,7 +14,7 @@ public class Feature {
 		int [][] sample=extract_sample(audio,sample_rate,pref);
 		Object[] c=new Object[4];
 		int [] value_sample=new int[sample.length];
-		
+
 
 
 		MyDatabase db=new MyDatabase(context);
@@ -24,16 +24,16 @@ public class Feature {
 		for(int n=0;n<sample.length;n++){
 			c[2]=ZeroCrossingRate(sample[n]);
 			double zcr=(Double) c[2];
-			
+
 			c[1]=LowEnergyFrameRate(sample[n]);
 			double lefr=(Double) c[1];
-		    
+
 			c[0]=SpectralCentroid(sample[n], sample_rate);
 			double centroid=(Double) c[0];
-			
+
 			c[3]=ShannonEntropy(sample[n]);
 			double entropy=(Double) c[3];
-			
+
 			String [] elemento={"parco","lezione","treno","tv","auto","ristorante","strada"};
 
 			try {
@@ -134,29 +134,29 @@ public class Feature {
 		}
 		return num/den;
 	}
-	
-	
+
+
 	public static double ShannonEntropy(int[] audio) {
-		  Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-		  // count the occurrences of each value
-		  for (int i=0;i<audio.length;i++) {
-		    if (!map.containsKey(audio[i])) {
-		      map.put(audio[i], 0);
-		    }
-		    map.put(audio[i], map.get(audio[i]) + 1);
-		  }
-
-		  // calculate the entropy
-		  Double result = 0.0;
-		  for (Integer sequence : map.keySet()) {
-		    Double frequency = (double) map.get(sequence)/ audio.length;
-		    result -= frequency * (Math.log(frequency) / Math.log(2));
-		  }
-
-		  return result;
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+		// count the occurrences of each value
+		for (int i=0;i<audio.length;i++) {
+			if (!map.containsKey(audio[i])) {
+				map.put(audio[i], 0);
+			}
+			map.put(audio[i], map.get(audio[i]) + 1);
 		}
 
-	
+		// calculate the entropy
+		Double result = 0.0;
+		for (Integer sequence : map.keySet()) {
+			Double frequency = (double) map.get(sequence)/ audio.length;
+			result -= frequency * (Math.log(frequency) / Math.log(2));
+		}
+
+		return result;
+	}
+
+
 
 	private static double ZeroCrossingRate(int[] audio) {
 		int prima=audio[0];
@@ -173,20 +173,20 @@ public class Feature {
 }
 
 class Linspace {
-    private float current;
-    private final float end;
-    private final float step;
-    public Linspace(float start, float end, int totalCount) {
-        this.current=start;
-        this.end=end;
-        this.step=(end - start) / totalCount;
-    }
-    public boolean hasNext() {
-        return current < (end + step/2); //MAY stop floating point error
-    }
-    public float getNextFloat() {
-        current+=step;
-        return current;
-    }
+	private float current;
+	private final float end;
+	private final float step;
+	public Linspace(float start, float end, int totalCount) {
+		this.current=start;
+		this.end=end;
+		this.step=(end - start) / totalCount;
+	}
+	public boolean hasNext() {
+		return current < (end + step/2); //MAY stop floating point error
+	}
+	public float getNextFloat() {
+		current+=step;
+		return current;
+	}
 }
 

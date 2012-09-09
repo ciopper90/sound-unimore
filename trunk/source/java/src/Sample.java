@@ -3,10 +3,7 @@ public class Sample {
 	String name;
 	String classe;
 	int[] camp;
-	
-	
-	
-	
+
 	public Sample(String name, String classe, int[] camp) {
 		super();
 		this.name = name;
@@ -37,9 +34,9 @@ public class Sample {
 		for(int i=0;i<(this.camp.length);i++){
 			this.camp[i]=Integer.parseInt(ciao[i]);
 		}
-	//	System.out.println(this.camp);
+		//	System.out.println(this.camp);
 		//this.camp = camp;
 	}
 
-	
+
 }

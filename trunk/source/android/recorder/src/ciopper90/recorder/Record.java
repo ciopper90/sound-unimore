@@ -50,8 +50,8 @@ public class Record extends Thread{
 		long time=0;
 		int i=0,k=0;
 		byte [][] temp=new byte[(audioBuffer.length/bufferSize)][bufferSize];
-		Log.d("dimensione", (audioBuffer.length/bufferSize) + "");
-		Log.d(bufferSize+"", audioBuffer.length+"");
+		//Log.d("dimensione", (audioBuffer.length/bufferSize) + "");
+		//Log.d(bufferSize+"", audioBuffer.length+"");
 		while(true){
 			if(k==0)
 				data_start= new GregorianCalendar();
@@ -69,27 +69,16 @@ public class Record extends Thread{
 				int indice=a/bufferSize;
 				audioBuffer[a]=temp[indice][a-indice*bufferSize];				
 			}
-			
-			
+
+
 			i=0;
 			//start elaborazione
 			sample_value[k]=Feature.extractFeature(audioBuffer,sampleRateInHz,context,textData,prefs);			
 
 
 			String [] elemento={"parco","lezione","treno","tv","auto","ristorante","strada"};
-			//String scelta=elemento[element];
-
-			/*/if(evento==null){
-				n.notify(scelta, context);		
-			}else{
-				if(evento!=scelta){
-					n.notify(scelta, context);		
-					evento=scelta;
-				}
-			}*/
 			long stop=System.currentTimeMillis();
-			//Log.d("tempo", stop-start+"");
-			Log.d("time", time+"");
+			//Log.d("time", time+"");
 			SystemClock.sleep((prefs.getInt("m", 10)*1000)-(stop-start));
 			time=time+10;
 			k++;
@@ -129,12 +118,7 @@ public class Record extends Thread{
 				editor.putInt(TEXT_DATA_KEY, ++textData);
 				editor.commit();
 				double percentuale=((double) max)/(sample_value.length*sample_value[0].length);
-				//if(percentuale>=0.5){
 				db.insertEvent(elemento[element], textData, (int) (percentuale*100), inizio);
-				//}else{
-				//scrivi unknown
-				//	db.insertEvent("unknown", textData, percentuale, inizio);
-				//}
 				db.close();
 				k=0;
 				time=0;           
