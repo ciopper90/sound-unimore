@@ -61,7 +61,7 @@ public class Main extends Activity {
 	}   
 
 	public void aggiornalist() {
-		Log.d("aggiorna", "eseguito");
+		//Log.d("aggiorna", "eseguito");
 
 		ListEvent=CaricaEvent();
 		Log.d("elementi", ListEvent.size()+"");

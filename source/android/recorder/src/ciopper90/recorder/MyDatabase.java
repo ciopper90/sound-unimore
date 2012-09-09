@@ -42,7 +42,7 @@ public class MyDatabase {
 		cv.put(ProductsMetaData.PRODUCT_NAME_HOUR, hour);
 		mDb.insert(ProductsMetaData.TABLE_PRODUCTS, null, cv);
 	}
-	
+
 	public void insertEvent(String name,int number,double perc,String hour){ //metodo per inserire i dati
 		ContentValues cv=new ContentValues();
 		cv.put(ProductsMetaData.PRODUCT_NAME_KEY, name);
