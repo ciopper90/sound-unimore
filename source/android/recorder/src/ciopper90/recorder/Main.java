@@ -45,26 +45,26 @@ public class Main extends Activity {
 		editor.putInt("h", 60);
 		editor.commit();	
 		db=new MyDatabase(this.getApplicationContext());
+		//se non esiste il thread lo creo
 		if(work==null){
 			work=new Record(getApplicationContext(),prefs);
 			work.start();
+			Runnable mUpdateTimeTask = new Runnable() {
+				public void run() {
+					aggiornalist();
+					mHandler.postDelayed(this, 60000);
+				} 
+			};
+			mHandler=new Handler();
+			mHandler.postDelayed(mUpdateTimeTask, 5000);
 		}
-		Runnable mUpdateTimeTask = new Runnable() {
-			public void run() {
-				aggiornalist();
-				mHandler.postDelayed(this, 60000);
-			} 
-		};
-		mHandler=new Handler();
-		mHandler.postDelayed(mUpdateTimeTask, 5000);
 		aggiornalist();
 	}   
 
 	public void aggiornalist() {
 		//Log.d("aggiorna", "eseguito");
-
 		ListEvent=CaricaEvent();
-		Log.d("elementi", ListEvent.size()+"");
+		//Log.d("elementi", ListEvent.size()+"");
 		if(ListEvent==null){
 			ListEvent=new ArrayList<Event>();
 		}
@@ -99,24 +99,27 @@ public class Main extends Activity {
 		//utilizzo dell'adapter
 		((ListView)findViewById(R.id.element)).setAdapter(adapter);
 		listView=(ListView)findViewById(R.id.element);
-		//listView.invalidate();
 	}
 
 	private ArrayList<Event> unione(ArrayList<Event> list) {
 		int k=0;
 		ArrayList<Event> ret=new ArrayList<Event>();
+		//se dimensione >=1 setto il primo elemento della lista altrimenti ritorno una lista vuota
 		if(list.size()>=1){
 			ret.add(list.get(0));
 			ret.get(0).setFine("");
-		}
-		else
+		}else{
 			return ret;
+		}
+		
 		for(int i=1;i<list.size();i++){
+			//unisce due elementi con stesso evento e orari coincidenti
 			if(list.get(i).getEvento().equals(ret.get(k).getEvento()) &&  (list.get(i).getFine().equals(ret.get(k).getInizio()))){
 				ret.get(k).setInizio(list.get(i).getInizio());
 				ret.get(k).setPerc((ret.get(k).getCampioni()*Double.parseDouble(ret.get(k).getPerc())+list.get(i).getCampioni()*Double.parseDouble(list.get(i).getPerc()))/(list.get(i).getCampioni()+ret.get(k).getCampioni()));
 				ret.get(k).setCampioni(list.get(i).getCampioni()+ret.get(k).getCampioni());
 			}else{
+				//aggiunge un nuovo elemento alla lista
 				ret.add(list.get(i));
 				k++;
 			}
@@ -125,6 +128,7 @@ public class Main extends Activity {
 		return ret;
 	}
 
+	//funzione che legge dal db e carica gli eventi
 	private ArrayList<Event> CaricaEvent() {
 		db.open();
 		Cursor c=db.fetchEvents(); // query
@@ -132,20 +136,21 @@ public class Main extends Activity {
 		ArrayList<Event> a = new ArrayList<Event>();
 		int i=0;
 		while(c.moveToNext()&&i<40){
-			i++;
 			a.add(new Event(c.getString(1),c.getString(4),c.getString(3)));
+			i++;
 		}
 		c.close();
 		db.close();
 		return a;
 	}
 
+	//menu con tasto aggiorna
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
 		int order = Menu.FIRST;
 		int GROUPA = 0;
-		menu.add(GROUPA,order,order++,"Aggiorna").setIcon(android.R.drawable.ic_menu_preferences);	
+		menu.add(GROUPA,order,order++,"Aggiorna").setIcon(R.drawable.ic_menu_refresh);	
 		return true;
 	}
 

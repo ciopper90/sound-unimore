@@ -37,7 +37,6 @@ public class Record extends Thread{
 		size=prefs.getInt("n", 0)*24*1024;
 		audioBuffer=new byte[size];
 		sample_value=new int[prefs.getInt("h", 60)/prefs.getInt("m", 10)][];
-
 		bufferSize=size;
 		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,sampleRateInHz, channelConfig, audioFormat, bufferSize);
 		db=new MyDatabase(cont);
@@ -74,16 +73,14 @@ public class Record extends Thread{
 			i=0;
 			//start elaborazione
 			sample_value[k]=Feature.extractFeature(audioBuffer,sampleRateInHz,context,textData,prefs);			
+			//fine elaborazione
 
-
-			String [] elemento={"parco","lezione","treno","tv","auto","ristorante","strada"};
-			long stop=System.currentTimeMillis();
-			//Log.d("time", time+"");
-			SystemClock.sleep((prefs.getInt("m", 10)*1000)-(stop-start));
+			String [] elemento={"parco","dialogo","treno","tv","auto","ristorante","strada"};
+			
 			time=time+10;
 			k++;
+			long stop=System.currentTimeMillis();
 			if(k==sample_value.length){
-				Log.d("time", time+"");
 				//calcolo della media dei 3 vettori
 				//istanzio vettore
 				int [] count=new int[7];
@@ -123,6 +120,10 @@ public class Record extends Thread{
 				k=0;
 				time=0;           
 			}
+			//metto in sleep il thread
+			long tempo=(prefs.getInt("m", 10)*1000)-(stop-start);
+			if(tempo>0)
+				SystemClock.sleep(tempo);
 		}
 	}
 }

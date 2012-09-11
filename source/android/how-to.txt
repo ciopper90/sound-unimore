@@ -1,0 +1,42 @@
+per poter modificare/compilare il codice ho usato eclipse juno(4.2) e l'SDK android(scaricando android 2.2)
+ecco una guida presa da anddev.it per installare eclipse e sdk
+
+Ecco una guida su come installare l'SDK 2.0 di Android su Windows XP, Vista e 7.
+
+1)Installare Eclipse
+Dal sito di Eclipse scaricare la versione
+Eclipse IDE for Java Developers
+
+2)Scaricare l'SDK
+scaricare sdk direttamente da http://developer.android.com/index.html
+
+3)Aggiungere i repository Android a Eclipse
+Aprire Eclipse e dal menu Help scegliere Check for update.
+Riceveremo un messaggio che ci avvertirà che non ci sono repository. Nella finestra successiva sarà possibile aggiungerli.
+
+Premiamo Add e diamo Android come nome e nell'URL inseriamo:
+https://dl-ssl.google.com/android/eclipse/
+
+Chiudiamo e andiamo questa volta nel menu Help > Install New Software
+e scegliamo la voce Developer Tools.
+
+Procediamo con l'installazione fino alla fine.
+
+Aggiungiamo gli ambienti di lavoro e debug di Android
+Andiamo alla voce Window > Preferences
+Scegliamo la voce Android e in SDK Location inseriamo l'indirizzo di dove si trova l'SDK sul nostro computer.
+Poi Apply e poi OK.
+
+Aggiungiamo i componenti aggiuntivi di Android
+Andiamo alla voce Window > Android SDK and ADV Manager
+e scegliamo Available Packages. Apriamo il repository di Google (l'unico presente), senza spuntarlo. Selezioniamo poi le ultime API e la documentazione (nel nostro caso erano la versione 5).
+Una volta fatto il refresh scegliamo Install Selected e al passo successivo Accept All. Infine Install Accepted.
+
+
+per aggiungere il progetto ad eclipse basta fare 
+1)file->import->existing android code into workspace
+2)selezionare come root directory la cartella android dentro source
+3)selezionare il progetto e fare "Finish"
+
+
+
