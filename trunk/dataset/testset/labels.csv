@@ -1,0 +1,13 @@
+#	1:	auto,treno,bus,ristorante,centrocommerciale,parco,pub,tv,strada,meeting
+#	2:	indoor,outdoor
+#	3:	silenzio,1p,2p,rumore
+#	4:	fermo,spostamento
+#	5:	note
+#		
+auto_02.wav,auto,outdoor,silenzio,spostamento,no	comment	
+lezione_02.wav,lezione,indoor,1p,fermo,no	comment	
+parco_02.wav,parco,outdoor,silenzio,fermo,no	comment	
+ristorante_02.wav,ristorante,indoor,rumore,fermo,no	comment	
+strada_02.wav,strada,indoor,rumore,spostamento,no	comment	
+treno_02.wav,treno,indoor,rumore,spostamento,no	comment	
+tv_02.wav,tv,indoor,2p,fermo,no	comment	
