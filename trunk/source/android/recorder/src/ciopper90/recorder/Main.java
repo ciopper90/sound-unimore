@@ -17,7 +17,7 @@ import android.widget.SimpleAdapter;
 
 public class Main extends Activity {
 	//variabili di configurazione
-	private static Thread work;
+	private static Record work;
 	// Identificatore delle preferenze dell'applicazione
 	private final static String MY_PREFERENCES = "MyPref";
 	private SharedPreferences prefs;
@@ -150,21 +150,22 @@ public class Main extends Activity {
 		super.onCreateOptionsMenu(menu);
 		int order = Menu.FIRST;
 		int GROUPA = 0;
-		menu.add(GROUPA,order,order++,"Aggiorna").setIcon(R.drawable.ic_menu_refresh);	
+		menu.add(GROUPA,order,order++,"Refresh").setIcon(R.drawable.ic_menu_refresh);	
+		menu.add(GROUPA,order,order++,"Quit").setIcon(R.drawable.ic_menu_refresh);	
 		return true;
 	}
 
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case 0:
+		if(item.getTitle().equals("Refresh")){
 			aggiornalist();
-			return true;
-		default:
-			aggiornalist();
-			return true;
+			return true;}
+		if(item.getTitle().equals("Quit")){
+			work.alt();
+			this.finish();
 		}
+		return true;
 	}
 
 

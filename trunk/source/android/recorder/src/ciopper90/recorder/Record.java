@@ -24,6 +24,7 @@ public class Record extends Thread{
 	private int[][] sample_value;
 	private MyDatabase db;
 	GregorianCalendar data_start,data_end;
+	private boolean continua;
 
 
 
@@ -40,7 +41,7 @@ public class Record extends Thread{
 		bufferSize=size;
 		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,sampleRateInHz, channelConfig, audioFormat, bufferSize);
 		db=new MyDatabase(cont);
-
+		continua=true;
 
 	}
 
@@ -51,7 +52,7 @@ public class Record extends Thread{
 		byte [][] temp=new byte[(audioBuffer.length/bufferSize)][bufferSize];
 		//Log.d("dimensione", (audioBuffer.length/bufferSize) + "");
 		//Log.d(bufferSize+"", audioBuffer.length+"");
-		while(true){
+		while(continua){
 			if(k==0)
 				data_start= new GregorianCalendar();
 			long start=System.currentTimeMillis();
@@ -75,7 +76,7 @@ public class Record extends Thread{
 			sample_value[k]=Feature.extractFeature(audioBuffer,sampleRateInHz,context,textData,prefs);			
 			//fine elaborazione
 
-			String [] elemento={"parco","dialogo","treno","tv","auto","ristorante","strada"};
+			String [] elemento={"silence","dialogue","train","tv","car","restaurant","road"};
 			
 			time=time+10;
 			k++;
@@ -125,5 +126,8 @@ public class Record extends Thread{
 			if(tempo>0)
 				SystemClock.sleep(tempo);
 		}
+	}
+	public void alt(){
+		continua=false;
 	}
 }

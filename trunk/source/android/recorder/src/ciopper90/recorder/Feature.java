@@ -34,8 +34,8 @@ public class Feature {
 			c[3]=ShannonEntropy(sample[n]);
 			double entropy=(Double) c[3];
 
-			String [] elemento={"parco","lezione","treno","tv","auto","ristorante","strada"};
-
+			String [] elemento={"silence","dialogue","train","tv","car","restaurant","road"};
+			
 			try {
 				db.open();
 				//classify sample
