@@ -7,6 +7,9 @@ import android.content.SharedPreferences;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -25,10 +28,11 @@ public class Record extends Thread{
 	private MyDatabase db;
 	GregorianCalendar data_start,data_end;
 	private boolean continua;
+	private Handler handler;
 
 
 
-	public Record(Context cont,SharedPreferences shared){
+	public Record(Context cont,SharedPreferences shared,Handler handler){
 
 		//inizializzazione variabili generali
 		int channelConfig=AudioFormat.CHANNEL_IN_MONO;
@@ -42,6 +46,7 @@ public class Record extends Thread{
 		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,sampleRateInHz, channelConfig, audioFormat, bufferSize);
 		db=new MyDatabase(cont);
 		continua=true;
+		this.handler=handler;
 
 	}
 
@@ -77,7 +82,7 @@ public class Record extends Thread{
 			//fine elaborazione
 
 			String [] elemento={"silence","dialogue","train","tv","car","restaurant","road"};
-			
+
 			time=time+10;
 			k++;
 			long stop=System.currentTimeMillis();
@@ -119,7 +124,8 @@ public class Record extends Thread{
 				db.insertEvent(elemento[element], textData, (int) (percentuale*100), inizio);
 				db.close();
 				k=0;
-				time=0;           
+				time=0;     
+				notifyMessage();
 			}
 			//metto in sleep il thread
 			long tempo=(prefs.getInt("m", 10)*1000)-(stop-start);
@@ -127,7 +133,25 @@ public class Record extends Thread{
 				SystemClock.sleep(tempo);
 		}
 	}
+
 	public void alt(){
 		continua=false;
 	}
+	
+	public boolean isalt(){
+		return !continua;
+	}
+	
+	public void restart(){
+		continua=true;
+	}
+
+	private void notifyMessage() {
+		Message msg = handler.obtainMessage();
+		Bundle b = new Bundle();
+		msg.setData(b);
+		handler.sendMessage(msg);
+	}
+
+
 }

@@ -32,15 +32,23 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		String out="@relation 'dataset'\n@attribute sc real\n@attribute lefr real\n@attribute zcr real\n@attribute entropy real\n@attribute name string\n@attribute class {parco,lezione,treno,tv,auto,ristorante,strada}\n@data\n\n";
+		/*String out="@relation 'dataset'\n@attribute sc real\n@attribute lefr real\n@attribute zcr real\n@attribute entropy real\n@attribute name string\n@attribute class {parco,lezione,treno,tv,auto,ristorante,strada}\n@data\n\n";
 		for(int i=0;i<m.size();i++){
 			Sample c=(Sample) m.get(i);
 			//System.out.println(c.getName());
 			double[] d=Feature.feature(c);
 			out=out.concat(d[0]+","+d[1]+","+d[2]+","+d[3]+","+c.getName()+","+c.getClasse()+"\n");
+		}*/
+		String out="type\tname\tsc\tlefr\tzcr\tentropy\nd\td\tc\tc\tc\tc\nclass\n";
+		for(int i=0;i<m.size();i++){
+			Sample c=(Sample) m.get(i);
+			//System.out.println(c.getName());
+			double[] d=Feature.feature(c);
+			out=out.concat(c.getClasse()+"\t"+c.getName()+"\t"+d[0]+"\t"+d[1]+"\t"+d[2]+"\t"+d[3]+"\n");
 		}
+		
 		try {
-			BufferedWriter wri=new BufferedWriter(new FileWriter("dataset.arff"));
+			BufferedWriter wri=new BufferedWriter(new FileWriter("dataseta.tab"));
 			wri.write(out);
 			wri.flush();
 			wri.close();
