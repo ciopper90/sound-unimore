@@ -9,7 +9,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -47,19 +47,24 @@ public class Main extends Activity {
 		db=new MyDatabase(this.getApplicationContext());
 		//se non esiste il thread lo creo
 		if(work==null){
-			work=new Record(getApplicationContext(),prefs);
+			mHandler=new MyHandler();
+			work=new Record(getApplicationContext(),prefs,mHandler);
 			work.start();
-			Runnable mUpdateTimeTask = new Runnable() {
-				public void run() {
-					aggiornalist();
-					mHandler.postDelayed(this, 60000);
-				} 
-			};
-			mHandler=new Handler();
-			mHandler.postDelayed(mUpdateTimeTask, 5000);
+		}
+		if(work.isalt()){
+			work.restart();
+			work.start();
 		}
 		aggiornalist();
 	}   
+
+	private class MyHandler extends Handler {
+		@Override
+		public void handleMessage(Message msg) {
+			Bundle bundle = msg.getData();
+			aggiornalist();
+		}
+	}
 
 	public void aggiornalist() {
 		//Log.d("aggiorna", "eseguito");
@@ -111,7 +116,7 @@ public class Main extends Activity {
 		}else{
 			return ret;
 		}
-		
+
 		for(int i=1;i<list.size();i++){
 			//unisce due elementi con stesso evento e orari coincidenti
 			if(list.get(i).getEvento().equals(ret.get(k).getEvento()) &&  (list.get(i).getFine().equals(ret.get(k).getInizio()))){
@@ -151,7 +156,7 @@ public class Main extends Activity {
 		int order = Menu.FIRST;
 		int GROUPA = 0;
 		menu.add(GROUPA,order,order++,"Refresh").setIcon(R.drawable.ic_menu_refresh);	
-		menu.add(GROUPA,order,order++,"Quit").setIcon(R.drawable.ic_menu_refresh);	
+		menu.add(GROUPA,order,order++,"Quit").setIcon(android.R.drawable.ic_menu_close_clear_cancel);	
 		return true;
 	}
 
